@@ -26,9 +26,7 @@ export async function POST(req: Request): Promise<Response> {
 
       const collection = await astraDb.collection(`chat_${similarityMetric}`);
       const cursor = collection.find(null, {
-        sort: {
-          $vector: data[0]?.embedding,
-        },
+        sort: { $vector: data[0]?.embedding },
         limit: 5,
       });
 
@@ -44,7 +42,7 @@ export async function POST(req: Request): Promise<Response> {
       {
         role: 'system',
         content: `You are an AI assistant answering questions about Cassandra and Astra DB. Format responses using markdown where applicable.
-        ${docContext} 
+        ${docContext}
         If the answer is not provided in the context, the AI assistant will say, "I'm sorry, I don't know the answer".`,
       },
     ];
