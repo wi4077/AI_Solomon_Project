@@ -1,6 +1,6 @@
-// import OpenAI from 'openai';
-// import {OpenAIStream, StreamingTextResponse} from 'ai';
-// import {AstraDB} from "@datastax/astra-db-ts";
+import OpenAI from 'openai';
+import {OpenAIStream, StreamingTextResponse} from 'ai';
+import {AstraDB} from "@datastax/astra-db-ts";
 
 // const openai = new OpenAI({
 //   apiKey: process.env.OPENAI_API_KEY,
