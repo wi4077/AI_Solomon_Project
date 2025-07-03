@@ -2,7 +2,7 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 
 export const metadata = {
-  title: "RAGBot Starter",
+  title: "Solomon ChatBot",
   description: "RAGBot Starter - Powered by DataStax and Vercel",
 };
 

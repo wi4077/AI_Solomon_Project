@@ -2,10 +2,10 @@ import PromptSuggestionButton from "./PromptSuggestionButton";
 
 const PromptSuggestionRow = ({ onPromptClick }) => {
   const prompts = [
-    '자주하는 질문1?',
-    '자주하는 질문2?',
-    '자주하는 질문3?',
-    '자주하는 질문4?',
+    '확정일자는 왜 필요하나요?',
+    '계약 기간은 어떻게 설정하나요?',
+    '보증금·월세 납부 일정은 어떻게 되나요?',
+    '중도 해지 시 위약금 규정은 어떻게 되나요?',
   ];
 
   return (
