@@ -30,81 +30,130 @@ export default function Home() {
   //   handleSubmit(e, { options: { body: { useRag, llm, similarityMetric}}});
   // }
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+  async function sendMessage(text: string){
+    const userMessage = {id: crypto.randomUUID(), content: text, role:'user'};
+    const loadingMessage = {
+        id: crypto.randomUUID(),
+        content: '',
+        role: 'assistant',
+        processing: true,
+    };
+    setMessages(prev => [...prev, userMessage, loadingMessage]);
 
-  const handleSend = async (e) => {
+    try {
+        const res = await fetch(`${API_BASE}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({messages:userMessage.content}),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const { reply } = await res.json();
+
+        setMessages(prev =>
+            prev.map(m => 
+                m.id === loadingMessage.id
+                    ? {...m, content: reply, processing: false}
+                    : m
+            )
+        );
+    } catch {
+        setMessages(prev =>
+            prev.map(m =>
+                m.id === loadingMessage.id
+                    ? {...m, content: '요청에 실패했습니다.', processing: false}
+                    : m
+            )
+        );
+    }
+  }
+
+//   const handleSend = async (e) => {
+//     e.preventDefault();
+//     if (!input.trim()) return;
+
+//     const userMessage = {
+//       id: crypto.randomUUID(),
+//       content: input,
+//       role: 'user'
+//     };
+
+//   // 1. 사용자 메시지 + 로딩(typing) 메시지 두 개를 먼저 추가
+//     const loadingMessage = {
+//       id: crypto.randomUUID(),
+//       content: '',           // 비어있어도 OK
+//       role: 'assistant',
+//       processing: true       // Bubble이 dot-flashing 보여줌
+//     };
+//     setMessages(prev => [...prev, userMessage, loadingMessage]);
+//     const question = userMessage;
+//     setInput('');
+
+//     try {
+//       // 2) 백엔드에 질문 전송
+//       const res = await fetch(`${API_BASE}`, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ "messages":question.content }),
+//       });
+//       console.log(question.content)
+      
+//       if (!res.ok) throw new Error(`${res.status} 에러`);
+
+//       const { reply } = await res.json();  // FastAPI에서 { answer: "..."} 형태로 내려준다고 가정
+//       // 3) 어시스턴트 메시지 추가
+//       // const assistantMessage = {
+//       //   id: crypto.randomUUID(),
+//       //   content: reply,
+//       //   role: 'assistant'
+//       // };
+//       //   setMessages(prev => [...prev, assistantMessage]);
+//       setMessages(prev => 
+//         prev.map(m => 
+//           m.id === loadingMessage.id
+//             ? {...m, content: reply, processing: false}
+//             : m
+//         )
+//       );
+
+//     } catch (err) {
+//       // 에러 처리: 실패 메시지 추가
+//       const errorMessage = {
+//         id: crypto.randomUUID(),
+//         content: '서버 요청에 실패했습니다. 다시 시도해주세요.',
+//         role: 'assistant'
+//       };
+//       setMessages(prev => [...prev, errorMessage]);
+//       setMessages(prev =>
+//         prev.map(m =>
+//           m.id === loadingMessage.id
+//             ? {...m, content: errorMessage.content, processing: false}
+//             : m
+//         )
+//       );
+//       console.error(err);
+//     }
+//   };
+const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage = {
-      id: crypto.randomUUID(),
-      content: input,
-      role: 'user'
-    };
-
-  // 1. 사용자 메시지 + 로딩(typing) 메시지 두 개를 먼저 추가
-    const loadingMessage = {
-      id: crypto.randomUUID(),
-      content: '',           // 비어있어도 OK
-      role: 'assistant',
-      processing: true       // Bubble이 dot-flashing 보여줌
-    };
-    setMessages(prev => [...prev, userMessage, loadingMessage]);
-    const question = userMessage;
     setInput('');
+    await sendMessage(input);
+};
 
-    try {
-      // 2) 백엔드에 질문 전송
-      const res = await fetch(`${API_BASE}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ "messages":question.content }),
-      });
-      console.log(question.content)
-      
-      if (!res.ok) throw new Error(`${res.status} 에러`);
+// const handlePrompt = (promptText) => {
+//     const promptMessage = {
+//       id: crypto.randomUUID(),
+//       content: promptText,
+//       role: 'user'
+//     };
 
-      const { reply } = await res.json();  // FastAPI에서 { answer: "..."} 형태로 내려준다고 가정
-      // 3) 어시스턴트 메시지 추가
-      // const assistantMessage = {
-      //   id: crypto.randomUUID(),
-      //   content: reply,
-      //   role: 'assistant'
-      // };
-      //   setMessages(prev => [...prev, assistantMessage]);
-      setMessages(prev => 
-        prev.map(m => 
-          m.id === loadingMessage.id
-            ? {...m, content: reply, processing: false}
-            : m
-        )
-      );
-
-    } catch (err) {
-      // 에러 처리: 실패 메시지 추가
-      const errorMessage = {
-        id: crypto.randomUUID(),
-        content: '서버 요청에 실패했습니다. 다시 시도해주세요.',
-        role: 'assistant'
-      };
-      setMessages(prev => [...prev, errorMessage]);
-      setMessages(prev =>
-        prev.map(m =>
-          m.id === loadingMessage.id
-            ? {...m, content: errorMessage.content, processing: false}
-            : m
-        )
-      );
-      console.error(err);
-    }
-  };
-  const handlePrompt = (promptText) => {
-    const promptMessage = {
-      id: crypto.randomUUID(),
-      content: promptText,
-      role: 'user'
-    };
-
-    setMessages(prev => [...prev, promptMessage]);
+//     setMessages(prev => [...prev, promptMessage]);
+//   };
+  const handlePrompt = async (promptText: string) => {
+      setInput('');
+      await sendMessage(promptText);
   };
 
   return (
